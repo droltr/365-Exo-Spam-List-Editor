@@ -1,0 +1,36 @@
+# PowerShell
+*.ps1~
+*.swp
+
+# User data files
+blocked.txt
+!blocked.example.txt
+
+# Deleted/Archive files
+.deleted/
+
+# Logs
+*.log
+logs/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.code-workspace
+
+# Backup files
+*.bak
+*.backup
+
+# Test files
+test_*.txt
+tests/*.txt
+!tests/test-blocked.txt
+
+# Git
+.git/
+.gitattributes

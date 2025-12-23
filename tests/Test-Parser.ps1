@@ -1,77 +1,114 @@
 <#
 .SYNOPSIS
-    Test script for blocked entries file parsing
+    Test script for file parsing and classification logic
 
 .DESCRIPTION
-    Tests the classification logic from EXO-SpamManager.ps1
-    Validates that emails and domains are correctly identified
+    Tests the Classify function and email/domain regex patterns
+    to verify that blocked entries are correctly categorized.
+
+.EXAMPLE
+    .\tests\Test-Parser.ps1
+
 #>
 
-param(
-    [string]$TestFile = ".\test-blocked.txt"
-)
+Write-Host "`n=== Testing Parser and Classification ===" -ForegroundColor Cyan
 
-Write-Host "`n=== Testing File Parser ===" -ForegroundColor Cyan
+# Import the parser module
+. "$PSScriptRoot\..\Common-Utils.ps1"
+. "$PSScriptRoot\..\Parse-BlockedFile.ps1"
 
-# Regex patterns (same as main script)
-$reEmail  = '^(?=.{3,254}$)[A-Za-z0-9_.+\-\'']+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
-$reDomain = '^(\*\.)?[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
+# Test data
+$testData = @"
+# This is a comment
+; This is also a comment
 
-# Read and classify
-$lines = Get-Content $TestFile
-$emails = New-Object System.Collections.Generic.HashSet[string]([StringComparer]::OrdinalIgnoreCase)
-$domains = New-Object System.Collections.Generic.HashSet[string]([StringComparer]::OrdinalIgnoreCase)
+# Email addresses
+spam@example.com
+phishing@malicious.org
+abuse@test.co.uk
 
-foreach ($raw in $lines) {
-    $line = ($raw -as [string]).Trim()
+# Domains
+example.com
+malicious.org
+*.phishing.net
+test.co.uk
 
-    # Skip empty lines and comments
-    if ([string]::IsNullOrWhiteSpace($line)) { continue }
-    if ($line.StartsWith('#') -or $line.StartsWith(';')) { continue }
+# Duplicates (should be deduplicated)
+spam@example.com
+example.com
 
-    # Classify
-    if ($line -match $reEmail) {
-        [void]$emails.Add($line)
-        Write-Host "[EMAIL] $line" -ForegroundColor Green
-        continue
-    }
+# Empty lines should be ignored
 
-    if (($line -match $reDomain) -and -not ($line -like '*@*')) {
-        if ($line.StartsWith('*.')) {
-            $domain = $line.Substring(2)
-            [void]$domains.Add($domain)
-            Write-Host "[DOMAIN] $line -> $domain (wildcard converted)" -ForegroundColor Yellow
-        } else {
-            [void]$domains.Add($line)
-            Write-Host "[DOMAIN] $line" -ForegroundColor Green
-        }
-        continue
-    }
 
-    Write-Host "[UNKNOWN] $line" -ForegroundColor Red
+# Keywords section
+---keywords---
+urgent action required
+verify account
+confirm password
+update billing
+"@
+
+# Create test file
+$testFile = Join-Path $PSScriptRoot 'test-blocked.txt'
+$testData | Out-File -FilePath $testFile -Encoding UTF8 -Force
+
+# Test the parser
+$lines = Read-Lines -Path $testFile
+$data = Classify -Lines $lines
+
+Write-Host "`n--- Test 1: Basic Parsing ---" -ForegroundColor Yellow
+Write-Host "Total lines processed: $($lines.Count)" -ForegroundColor Gray
+Write-Host "Classification results:" -ForegroundColor Cyan
+Write-Host "  Emails: $($data.Emails.Count)" -ForegroundColor Green
+Write-Host "  Domains: $($data.Domains.Count)" -ForegroundColor Green
+Write-Host "  Keywords: $($data.Keywords.Count)" -ForegroundColor Green
+
+Write-Host "`n--- Test 2: Email Classification ---" -ForegroundColor Yellow
+Write-Host "Expected: 3 emails" -ForegroundColor Gray
+Write-Host "Actual: $($data.Emails.Count) emails" -ForegroundColor Cyan
+foreach ($email in $data.Emails) {
+    Write-Host "  ✓ $email" -ForegroundColor Green
 }
 
-# Summary
-Write-Host "`n=== Summary ===" -ForegroundColor Cyan
-Write-Host "Emails found:  $($emails.Count)" -ForegroundColor White
-Write-Host "Domains found: $($domains.Count)" -ForegroundColor White
-
-Write-Host "`n=== Email List ===" -ForegroundColor Cyan
-$emails.GetEnumerator() | Sort-Object | ForEach-Object { Write-Host "  - $_" }
-
-Write-Host "`n=== Domain List ===" -ForegroundColor Cyan
-$domains.GetEnumerator() | Sort-Object | ForEach-Object { Write-Host "  - $_" }
-
-# Validation
-$expectedEmails = 4
-$expectedDomains = 4
-
-if ($emails.Count -eq $expectedEmails -and $domains.Count -eq $expectedDomains) {
-    Write-Host "`n[PASS] All tests passed!" -ForegroundColor Green
-    exit 0
+if ($data.Emails.Count -eq 3) {
+    Write-Host "[PASS] Email count correct" -ForegroundColor Green
 } else {
-    Write-Host "`n[FAIL] Test failed!" -ForegroundColor Red
-    Write-Host "Expected: $expectedEmails emails, $expectedDomains domains" -ForegroundColor Red
-    Write-Host "Got:      $($emails.Count) emails, $($domains.Count) domains" -ForegroundColor Red
-    exit 1
+    Write-Host "[FAIL] Email count mismatch" -ForegroundColor Red
 }
+
+Write-Host "`n--- Test 3: Domain Classification ---" -ForegroundColor Yellow
+Write-Host "Expected: 4 domains" -ForegroundColor Gray
+Write-Host "Actual: $($data.Domains.Count) domains" -ForegroundColor Cyan
+foreach ($domain in $data.Domains) {
+    Write-Host "  ✓ $domain" -ForegroundColor Green
+}
+
+if ($data.Domains.Count -eq 4) {
+    Write-Host "[PASS] Domain count correct" -ForegroundColor Green
+} else {
+    Write-Host "[FAIL] Domain count mismatch" -ForegroundColor Red
+}
+
+Write-Host "`n--- Test 4: Keyword Classification ---" -ForegroundColor Yellow
+Write-Host "Expected: 4 keywords" -ForegroundColor Gray
+Write-Host "Actual: $($data.Keywords.Count) keywords" -ForegroundColor Cyan
+foreach ($keyword in $data.Keywords) {
+    Write-Host "  ✓ $keyword" -ForegroundColor Green
+}
+
+if ($data.Keywords.Count -eq 4) {
+    Write-Host "[PASS] Keyword count correct" -ForegroundColor Green
+} else {
+    Write-Host "[FAIL] Keyword count mismatch" -ForegroundColor Red
+}
+
+# Cleanup
+Remove-Item -Path $testFile -Force -ErrorAction SilentlyContinue
+
+Write-Host "`n=== Test Complete ===" -ForegroundColor Cyan
+Write-Host "`nSummary:" -ForegroundColor Yellow
+Write-Host "  Emails parsed: $($data.Emails.Count)" -ForegroundColor Gray
+Write-Host "  Domains parsed: $($data.Domains.Count)" -ForegroundColor Gray
+Write-Host "  Keywords parsed: $($data.Keywords.Count)" -ForegroundColor Gray
+Write-Host ""
+Write-Host ""

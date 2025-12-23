@@ -1,0 +1,128 @@
+# Exchange Online Spam Manager - Blocked Entries
+# ========================================================
+#
+# This file contains entries that will be blocked in your Exchange Online spam filter.
+# Lines starting with # or ; are treated as comments and will be ignored.
+#
+# SUPPORTED FORMATS:
+# ------------------
+# 1. Email addresses (added to BlockedSenders list)
+# 2. Domains (added to BlockedSenderDomains list)
+# 3. Keywords (added to Transport Rule blocking conditions)
+#
+# USAGE:
+# ------
+# - One entry per line
+# - Wildcards in domains (*.example.com) will be converted to root domain (example.com)
+# - Empty lines are ignored
+# - Keywords section must be separated with ---keywords--- marker
+#
+# ========================================================
+
+# ============================================
+# EMAIL ADDRESSES
+# ============================================
+# Add email addresses that should be blocked
+service10@freighthubltd.com
+satis@modica.tr
+destek@modica.com.tr
+sara@core-dxb.com
+sara@enub-me.com
+overseas20@seafreightllc.com
+overseas01@winneroceanllc.com
+sara@core-dxb.com
+eman@coreventehs.com
+zara@designcorevent.com
+spam@example.com
+phishing@malicious.org
+abuse@badactor.net
+
+# ============================================
+# DOMAINS
+# ============================================
+# Add domains that should be blocked
+# All emails from these domains will be blocked
+mail-m49243.qiye.163.com
+smtp.qiye.163.com
+winneroceanllc.com
+freighthubltd.com
+a3273150.bnc3.mailjet.com
+mailjet.com
+mail.core-dxb.com
+ovh.net
+mail-m155105.qiye.163.com
+winneroceanllc.com
+seafreightllc.com
+designcorevent.com
+mail.designcorevent.com
+euromsg.net
+greenenerji.com.tr
+coreventehs.com
+mail.coreventehs.com
+163.com
+qiye.163.com
+greenlighting.com.tr
+greenlighting.com
+malicious.com
+scammer.org
+*.phishing-site.net
+
+# ============================================
+# KEYWORDS
+# ============================================
+# Keywords for blocking emails based on subject/body content
+# Must be separated with ---keywords--- marker
+---keywords---
+Greetings from Corevents
+Why Attend This Masterclass
+Led by internationally respected EA trainer
+Evaluate, Mitigate and Responding to Challenges
+Nine deadly leadership behaviours & six winning strategies
+Case Studies: Why some companies fail and others survive
+Greetings from Winner INC
+FCL: SHENZHEN to ISTANBUL/IZMIT : port to port $ 1250 and $1980;
+3-Day Treasury Risk Managment in Practice Masterclass
+Grand Millennium Hotel, Kuala Lumpur - Malaysia
+Dusit Thani Hotel, Dubai – UAE
+Executive and Personal Assistant Essentials
+Why This Course Is a Must-Have for Today's Assistants
+sapık kardeşim
+götünü kurtarabilirsin
+sapık dostum
+videolarını yayınlarım
+tek derdim para
+pegasus diye bir şey
+casus yazılım
+bomba gibi çalışıyor
+sıkıntılı porno
+31 çektiğin
+video kaydettim
+iğrenç sapık
+öğrenmelerini sağlayabilirim
+rehberindeki herkese
+dünyan başına yıkılacak
+hayatın yerle bir olacak
+masum olduğunu sanma
+merhamet ederim
+tövbe edersen
+seni utandıracak tüm videoları
+hayatını mahvederdim
+48 saatin var
+kripto para nasıl aktarılır
+yeni ödeme yönteminiz onaylandı
+izi sürülemez
+polisle irtibata geçme
+videolarını yayınlarım
+The financial landscape in the MENA region is at a critical juncture
+According to the World Bank and IMF
+Day 1: Budgeting Frameworks & Cash Flow Mapping
+Sara Noor
+Limited to 20 seats to ensure personalized attention
+Link forecasting outputs to liquidity planning and buffer sizing
+Building predictive forecasts using historical cash flow patterns
+Limited to 20 seats to ensure personalized attention
+Join us in Dubai and equip your team with the tools to turn uncertainty into strategic advantage.
+suspicious phrase
+crypto scam
+password reset fraud
+urgent action required

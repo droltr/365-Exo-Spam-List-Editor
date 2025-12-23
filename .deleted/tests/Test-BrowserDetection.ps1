@@ -9,7 +9,7 @@
 Write-Host "`n=== Testing Browser Detection ===" -ForegroundColor Cyan
 
 # Import the function from main script
-$scriptContent = Get-Content "$PSScriptRoot\..\Get-Browser.ps1" -Raw
+$scriptContent = Get-Content "$PSScriptRoot\..\EXO-SpamManager.ps1" -Raw
 $functionMatch = $scriptContent -match '(?s)function Get-DefaultBrowser \{.*?\n\}'
 if ($functionMatch) {
     # Extract and execute the function

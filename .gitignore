@@ -6,7 +6,9 @@
 # User specific files
 *.txt
 !blocked_example.txt
-!blocked.txt
+
+# Deleted/Archived
+.deleted/
 
 # Executables
 *.exe

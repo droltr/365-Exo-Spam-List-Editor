@@ -5,19 +5,12 @@
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)
 
-A powerful and user-friendly GUI tool for managing Exchange Online spam filters. Easily import blocked senders, domains, and keywords from text files directly into your Exchange Online Protection (EOP) policies and Transport Rules.
+A powerful and user-friendly GUI tool for managing Exchange Online spam filters. Easily import blocked senders, domains,
+ and keywords from text files directly into your Exchange Online Protection (EOP) policies and Transport Rules.
 
-## 📥 Download
+This project provides a PowerShell-based interface to interact with Exchange Online, allowing administrators to manage spam lists efficiently.
 
-Get the latest standalone executable version:
-
-[![Download 365ExoSpamListEditor](https://img.shields.io/badge/Download-365ExoSpamListEditor.exe-green?style=for-the-badge&logo=windows)](https://github.com/droltr/365-Exo-Spam-List-Editor/releases/latest)
-
-## 📸 Screenshots
-
-*(Screenshots of the application will be added here)*
-
-## 🚀 Features
+## Features
 
 - **Modern GUI Interface:** Clean, dark-themed interface for easy navigation.
 - **Bulk Import:** Import hundreds of blocked emails, domains, and keywords from a single text file.
@@ -28,42 +21,35 @@ Get the latest standalone executable version:
 - **Secure Authentication:** Supports Modern Authentication (OAuth) with Device Code flow.
 - **Detailed Logging:** Real-time progress logs with timestamps.
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Windows 10/11 or Windows Server 2016+
 - PowerShell 5.1 or newer
 - Exchange Online Administrator permissions
 - Internet connection
 
-## 🛠️ Installation
+## Installation
 
-1. Download the latest release or clone this repository:
+1. Clone this repository:
 
-```bash
+`ash
 git clone https://github.com/droltr/365-Exo-Spam-List-Editor.git
-```
+`
 
-2. Ensure you have the `ExchangeOnlineManagement` module installed (the tool will attempt to install it if missing).
+2. Ensure you have the ExchangeOnlineManagement module installed (the tool will attempt to install it if missing).
 
-```powershell
+`powershell
 Install-Module -Name ExchangeOnlineManagement
-```
+`
 
-## 🚀 Usage
+## Usage
 
-### Method 1: Executable (Recommended)
-Double-click `365ExoSpamListEditor.exe` to launch the application.
-
-### Method 2: Batch Launcher
-Double-click `Run-365ExoSpamListEditor.bat`.
-
-### Method 3: PowerShell
-Run the startup script:
-```powershell
+Run the startup script via PowerShell:
+`powershell
 .\Start-365ExoSpamListEditor.ps1
-```
+`
 
-## 📖 How to Use
+## How to Use
 
 1. **Login:** Click the **Login** button in the top-right corner. Follow the instructions to authenticate with Microsoft.
 2. **Prepare File:** Create a text file with blocked entries or click **Create Example** to generate a template.
@@ -73,10 +59,10 @@ Run the startup script:
 
 See [USAGE.md](USAGE.md) for a detailed user guide.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

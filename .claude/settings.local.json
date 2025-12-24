@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(powershell -ExecutionPolicy Bypass -File \"Start-SpamManager.ps1\")",
-      "Bash(powershell -ExecutionPolicy Bypass -Command \"& { . ''.\\\\GUI-Interface.ps1''; Write-Host ''Script loaded successfully'' }\")"
-    ]
-  }
-}

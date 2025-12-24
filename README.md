@@ -1,6 +1,6 @@
-# Exchange Online Spam Manager
+# 365 Exo Spam List Editor
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/droltr/SpamManager)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/droltr/365-Exo-Spam-List-Editor)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)
@@ -11,7 +11,7 @@ A powerful and user-friendly GUI tool for managing Exchange Online spam filters.
 
 Get the latest standalone executable version:
 
-[![Download SpamManager](https://img.shields.io/badge/Download-SpamManager.exe-green?style=for-the-badge&logo=windows)](https://github.com/droltr/SpamManager/releases/latest)
+[![Download 365ExoSpamListEditor](https://img.shields.io/badge/Download-365ExoSpamListEditor.exe-green?style=for-the-badge&logo=windows)](https://github.com/droltr/365-Exo-Spam-List-Editor/releases/latest)
 
 ## 📸 Screenshots
 
@@ -40,7 +40,7 @@ Get the latest standalone executable version:
 1. Download the latest release or clone this repository:
 
 ```bash
-git clone https://github.com/droltr/SpamManager.git
+git clone https://github.com/droltr/365-Exo-Spam-List-Editor.git
 ```
 
 2. Ensure you have the `ExchangeOnlineManagement` module installed (the tool will attempt to install it if missing).
@@ -52,15 +52,15 @@ Install-Module -Name ExchangeOnlineManagement
 ## 🚀 Usage
 
 ### Method 1: Executable (Recommended)
-Double-click `SpamManager.exe` to launch the application.
+Double-click `365ExoSpamListEditor.exe` to launch the application.
 
 ### Method 2: Batch Launcher
-Double-click `Run-SpamManager.bat`.
+Double-click `Run-365ExoSpamListEditor.bat`.
 
 ### Method 3: PowerShell
 Run the startup script:
 ```powershell
-.\Start-SpamManager.ps1
+.\Start-365ExoSpamListEditor.ps1
 ```
 
 ## 📖 How to Use

@@ -1,11 +1,11 @@
-# Contributing to Exchange Online Spam Manager
+# Contributing to 365 Exo Spam List Editor
 
 Thank you for your interest in contributing! We welcome bug reports, feature requests, and pull requests.
 
 ## How to Contribute
 
 1. **Fork the Repository:** Click the "Fork" button on GitHub.
-2. **Clone your Fork:** `git clone https://github.com/droltr/SpamManager.git`
+2. **Clone your Fork:** `git clone https://github.com/droltr/365-Exo-Spam-List-Editor.git`
 3. **Create a Branch:** `git checkout -b feature/amazing-feature`
 4. **Make Changes:** Implement your feature or fix.
 5. **Test:** Run the tests in the `tests/` directory.

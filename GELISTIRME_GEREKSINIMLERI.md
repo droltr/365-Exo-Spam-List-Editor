@@ -1,6 +1,6 @@
-# Proje Geliştirme ve Gereksinim Dokümanı (Spam Manager)
+# Proje Geliştirme ve Gereksinim Dokümanı (365 Exo Spam List Editor)
 
-Bu doküman, **Exchange Online Spam Manager** projesinin geliştirilmesi, test edilmesi ve tamamlanması süreçlerinde yapay zeka asistanından beklenen standartları, teknik gereksinimleri ve tasarım tercihlerini içerir. Gelecekteki geliştirmelerde referans olarak kullanılmalıdır.
+Bu doküman, **365 Exo Spam List Editor** projesinin geliştirilmesi, test edilmesi ve tamamlanması süreçlerinde yapay zeka asistanından beklenen standartları, teknik gereksinimleri ve tasarım tercihlerini içerir. Gelecekteki geliştirmelerde referans olarak kullanılmalıdır.
 
 ## 1. Proje Özeti ve Amacı
 Exchange Online (Office 365) spam filtrelerini yönetmek için PowerShell tabanlı, grafik arayüzlü (GUI) bir araçtır. Kullanıcıların metin dosyalarından toplu olarak engellenen gönderici, alan adı ve anahtar kelime yüklemesini sağlar.
@@ -15,7 +15,7 @@ Exchange Online (Office 365) spam filtrelerini yönetmek için PowerShell tabanl
 
 ### 2.2. Kod Organizasyonu (Modüler Yapı)
 Proje tek bir devasa dosya yerine modüllere ayrılmalıdır:
-*   `Start-SpamManager.ps1`: Başlatıcı script (EXE derlemesi için giriş noktası).
+*   `Start-365ExoSpamListEditor.ps1`: Başlatıcı script (EXE derlemesi için giriş noktası).
 *   `Main-Controller.ps1`: İş mantığını yöneten ana kontrolcü.
 *   `GUI-Interface.ps1`: Tüm görsel arayüz kodları.
 *   `Connect-ExchangeOnline.ps1`: Bağlantı yönetimi.
@@ -80,7 +80,7 @@ Her değişiklikten sonra şu testler yapılmalıdır:
 ## 6. Paketleme ve Dağıtım
 *   **Executable:** `PS2EXE` modülü kullanılarak `.ps1` dosyası `.exe`'ye çevrilmelidir.
     *   *Önemli:* EXE derlenirken script path (`$PSScriptRoot`) sorunu için `[System.IO.Path]::GetDirectoryName` kullanılmalıdır.
-*   **Launcher:** Kullanıcı kolaylığı için `Run-SpamManager.bat` dosyası bulunmalıdır.
+*   **Launcher:** Kullanıcı kolaylığı için `Run-365ExoSpamListEditor.bat` dosyası bulunmalıdır.
 *   **Dokümantasyon:** `README.md`, `USAGE.md`, `CONTRIBUTING.md`, `CHANGELOG.md` ve `LICENSE` dosyaları eksiksiz olmalıdır.
 *   **Git:** Gereksiz dosyalar `.gitignore` ile engellenmelidir.
 

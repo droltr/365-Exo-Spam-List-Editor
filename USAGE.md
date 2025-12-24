@@ -1,6 +1,6 @@
-# User Guide - Exchange Online Spam Manager
+# User Guide - 365 Exo Spam List Editor
 
-This guide provides detailed instructions on how to use the Exchange Online Spam Manager tool.
+This guide provides detailed instructions on how to use the 365 Exo Spam List Editor tool.
 
 ## Table of Contents
 1. [Getting Started](#getting-started)
@@ -12,7 +12,7 @@ This guide provides detailed instructions on how to use the Exchange Online Spam
 
 ## Getting Started
 
-Launch the application using `SpamManager.exe` or `Run-SpamManager.bat`. The main interface will appear.
+Launch the application using `365ExoSpamListEditor.exe` or `Run-365ExoSpamListEditor.bat`. The main interface will appear.
 
 ## Authentication
 

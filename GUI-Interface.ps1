@@ -51,7 +51,7 @@ function Export-SelectedRules {
     
     Write-Host "[EXPORT] Starting export process..." -ForegroundColor Cyan
     $exportData = @()
-    $exportData += "# Exported from Exchange Online Spam Manager"
+    $exportData += "# Exported from 365 Exo Spam List Editor"
     $exportData += "# Date: $(Get-Date)"
     $exportData += ""
     
@@ -244,7 +244,7 @@ function Start-GUI {
 
     # Set up form
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Exchange Online Spam Manager'
+    $form.Text = '365 Exo Spam List Editor'
     $form.Size = New-Object System.Drawing.Size(700, 750)
     $form.MinimumSize = New-Object System.Drawing.Size(700, 750)
     $form.StartPosition = 'CenterScreen'
@@ -257,7 +257,7 @@ function Start-GUI {
     $titleLabel = New-Object System.Windows.Forms.Label
     $titleLabel.Location = New-Object System.Drawing.Point(20, 20)
     $titleLabel.Size = New-Object System.Drawing.Size(560, 30)
-    $titleLabel.Text = 'Exchange Online Spam Filter Manager'
+    $titleLabel.Text = '365 Exo Spam List Editor'
     $titleLabel.Font = New-Object System.Drawing.Font('Segoe UI', 14, [System.Drawing.FontStyle]::Bold)
     $titleLabel.ForeColor = $textColor
     $titleLabel.BackColor = $bgDark
@@ -344,7 +344,7 @@ function Start-GUI {
 
         if ($saveFileDialog.ShowDialog() -eq 'OK') {
             $exampleContent = @"
-# Exchange Online Spam Manager - Blocked List Example
+# 365 Exo Spam List Editor - Blocked List Example
 # Lines starting with # are comments and ignored.
 # Empty lines are ignored.
 
@@ -1033,7 +1033,7 @@ lottery winner
     # Form Load event - Initialize GUI without auto-connect
     $form.Add_Load({
         $outputTextBox.Clear()
-        & $Log "Welcome to Exchange Online Spam Manager"
+        & $Log "Welcome to 365 Exo Spam List Editor"
         & $Log "Checking connection status..."
 
         # Check for existing session using our improved function

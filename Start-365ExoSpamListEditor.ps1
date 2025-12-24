@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    GUI Launcher for Exchange Online Spam Manager
+    GUI Launcher for 365 Exo Spam List Editor
 
 .DESCRIPTION
     Launches the GUI interface by calling the GUI-Interface module

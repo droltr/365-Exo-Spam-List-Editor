@@ -235,6 +235,13 @@ function Start-GUI {
     $accentRed = [System.Drawing.Color]::FromArgb(220, 53, 69)   # Error red
     $borderColor = [System.Drawing.Color]::FromArgb(55, 55, 55)  # Subtle borders
 
+    # Helper for logging with timestamp and CRLF
+    $Log = {
+        param([string]$Msg)
+        $timestamp = (Get-Date).ToString("HH:mm:ss")
+        $outputTextBox.AppendText("[$timestamp] $Msg`r`n")
+    }
+
     # Set up form
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Exchange Online Spam Manager'
@@ -268,7 +275,7 @@ function Start-GUI {
 
     # File selection group
     $fileGroupBox = New-Object System.Windows.Forms.GroupBox
-    $fileGroupBox.Location = New-Object System.Drawing.Point(20, 90)
+    $fileGroupBox.Location = New-Object System.Drawing.Point(20, 150)
     $fileGroupBox.Size = New-Object System.Drawing.Size(660, 80)
     $fileGroupBox.Text = 'File Selection'
     $fileGroupBox.ForeColor = $textColor
@@ -282,28 +289,30 @@ function Start-GUI {
     $fileLabel.Size = New-Object System.Drawing.Size(100, 20)
     $fileLabel.Text = 'Blocked File:'
     $fileLabel.ForeColor = $textColor
-    $fileLabel.BackColor = $bgDark
+    $fileLabel.BackColor = $bgMedium
     $fileGroupBox.Controls.Add($fileLabel)
 
     # File path textbox
     $fileTextBox = New-Object System.Windows.Forms.TextBox
     $fileTextBox.Location = New-Object System.Drawing.Point(10, 45)
-    $fileTextBox.Size = New-Object System.Drawing.Size(500, 20)
+    $fileTextBox.Size = New-Object System.Drawing.Size(400, 20)
     $fileTextBox.Text = '.\blocked.txt'
     $fileTextBox.BackColor = $bgMedium
     $fileTextBox.ForeColor = $textColor
     $fileTextBox.BorderStyle = 'FixedSingle'
+    $fileTextBox.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left -bor [System.Windows.Forms.AnchorStyles]::Right
     $fileGroupBox.Controls.Add($fileTextBox)
 
     # Browse button
     $browseButton = New-Object System.Windows.Forms.Button
-    $browseButton.Location = New-Object System.Drawing.Point(520, 43)
+    $browseButton.Location = New-Object System.Drawing.Point(420, 43)
     $browseButton.Size = New-Object System.Drawing.Size(100, 25)
     $browseButton.Text = 'Browse...'
     $browseButton.BackColor = $bgLight
     $browseButton.ForeColor = $textColor
     $browseButton.FlatStyle = 'Flat'
     $browseButton.FlatAppearance.BorderColor = $textGray
+    $browseButton.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Right
     $browseButton.Add_Click({
         $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
         $openFileDialog.Filter = 'Text files (*.txt)|*.txt|All files (*.*)|*.*'
@@ -316,39 +325,161 @@ function Start-GUI {
     })
     $fileGroupBox.Controls.Add($browseButton)
 
-    # Define Update-ConnectionStatus as a script block (will be used after controls are created)
+    # Create Example button
+    $createExampleButton = New-Object System.Windows.Forms.Button
+    $createExampleButton.Location = New-Object System.Drawing.Point(530, 43)
+    $createExampleButton.Size = New-Object System.Drawing.Size(120, 25)
+    $createExampleButton.Text = 'Create Example'
+    $createExampleButton.BackColor = $bgLight
+    $createExampleButton.ForeColor = $textColor
+    $createExampleButton.FlatStyle = 'Flat'
+    $createExampleButton.FlatAppearance.BorderColor = $textGray
+    $createExampleButton.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Right
+    $createExampleButton.Add_Click({
+        $saveFileDialog = New-Object System.Windows.Forms.SaveFileDialog
+        $saveFileDialog.Filter = 'Text files (*.txt)|*.txt|All files (*.*)|*.*'
+        $saveFileDialog.Title = 'Create Example Blocked List'
+        $saveFileDialog.FileName = 'blocked_example.txt'
+        $saveFileDialog.InitialDirectory = $PSScriptRoot
+
+        if ($saveFileDialog.ShowDialog() -eq 'OK') {
+            $exampleContent = @"
+# Exchange Online Spam Manager - Blocked List Example
+# Lines starting with # are comments and ignored.
+# Empty lines are ignored.
+
+# --- EMAIL ADDRESSES ---
+# Add email addresses to block specific senders.
+spammer@bad-domain.com
+phishing@malicious.net
+
+# --- DOMAINS ---
+# Add domains to block all emails from that domain.
+# Wildcards are supported (e.g., *.example.com).
+bad-domain.com
+*.malicious.net
+
+# --- KEYWORDS ---
+# Add keywords to block emails containing these words in subject or body.
+# This section must start with the exact line: ---keywords---
+---keywords---
+urgent action required
+verify your account
+lottery winner
+"@
+            try {
+                $exampleContent | Out-File -FilePath $saveFileDialog.FileName -Encoding UTF8
+                & $Log "Created example file: $($saveFileDialog.FileName)"
+                $fileTextBox.Text = $saveFileDialog.FileName
+                [System.Windows.Forms.MessageBox]::Show(
+                    "Example file created successfully!`nPath: $($saveFileDialog.FileName)",
+                    'Success',
+                    'OK',
+                    'Information'
+                )
+            } catch {
+                & $Log "Failed to create example file: $($_.Exception.Message)"
+                [System.Windows.Forms.MessageBox]::Show(
+                    "Failed to create file: $($_.Exception.Message)",
+                    'Error',
+                    'OK',
+                    'Error'
+                )
+            }
+        }
+    })
+    $fileGroupBox.Controls.Add($createExampleButton)
+
+    # Connection GroupBox (Top)
+    $connectionGroupBox = New-Object System.Windows.Forms.GroupBox
+    $connectionGroupBox.Location = New-Object System.Drawing.Point(20, 80)
+    $connectionGroupBox.Size = New-Object System.Drawing.Size(660, 60)
+    $connectionGroupBox.Text = 'Connection'
+    $connectionGroupBox.ForeColor = $textColor
+    $connectionGroupBox.BackColor = $bgMedium
+    $connectionGroupBox.FlatStyle = 'Flat'
+    $connectionGroupBox.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Left -bor [System.Windows.Forms.AnchorStyles]::Right
+    $form.Controls.Add($connectionGroupBox)
+
+    # Connection status indicator
+    $connectionLabel = New-Object System.Windows.Forms.Label
+    $connectionLabel.Location = New-Object System.Drawing.Point(620, 20)
+    $connectionLabel.Size = New-Object System.Drawing.Size(20, 20)
+    $connectionLabel.Text = ''
+    $connectionLabel.BackColor = [System.Drawing.Color]::FromArgb(255, 165, 0) # Orange for not connected
+    $connectionLabel.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Right
+    $connectionGroupBox.Controls.Add($connectionLabel)
+
+    # Account label
+    $accountLabel = New-Object System.Windows.Forms.Label
+    $accountLabel.Location = New-Object System.Drawing.Point(350, 20)
+    $accountLabel.Size = New-Object System.Drawing.Size(260, 20)
+    $accountLabel.Text = 'Not connected'
+    $accountLabel.Font = New-Object System.Drawing.Font('Segoe UI', 9)
+    $accountLabel.ForeColor = $textGray
+    $accountLabel.BackColor = $bgMedium
+    $accountLabel.TextAlign = 'MiddleRight'
+    $accountLabel.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Right
+    $connectionGroupBox.Controls.Add($accountLabel)
+
+    # Define Update-ConnectionStatus as a script block
     $script:UpdateConnectionStatusBlock = {
         if (Test-ExchangeOnlineConnection) {
-            $connectionLabel.Text = 'OK'
-            $connectionLabel.ForeColor = [System.Drawing.Color]::FromArgb(0, 184, 148)
+            $connectionLabel.BackColor = [System.Drawing.Color]::FromArgb(0, 184, 148) # Green
             $statusLabel.Text = 'Connected to Exchange Online'
             $statusLabel.ForeColor = [System.Drawing.Color]::FromArgb(0, 184, 148)
             $startButton.Enabled = $true
             $loginButton.Enabled = $false
             $logoutButton.Enabled = $true
+            $loginButton.Visible = $false
+            $logoutButton.Visible = $true
+            
+            # Try to get account info
+            try {
+                $account = (Get-ConnectionInformation | Select-Object -ExpandProperty UserPrincipalName -ErrorAction SilentlyContinue)
+                if (-not $account) {
+                    # Fallback to PSSession check
+                    $session = Get-PSSession | Where-Object { $_.ConfigurationName -eq 'Microsoft.Exchange' -and $_.State -eq 'Opened' } | Select-Object -First 1
+                    if ($session -and $session.Runspace.ConnectionInfo.Credential) {
+                        $account = $session.Runspace.ConnectionInfo.Credential.UserName
+                    }
+                }
+                
+                if ($account) {
+                    $accountLabel.Text = $account
+                    $accountLabel.ForeColor = $accentGreen
+                } else {
+                    $accountLabel.Text = "Connected"
+                }
+            } catch {
+                $accountLabel.Text = "Connected"
+            }
         } else {
-            $connectionLabel.Text = 'X'
-            $connectionLabel.ForeColor = [System.Drawing.Color]::FromArgb(255, 165, 0)
+            $connectionLabel.BackColor = [System.Drawing.Color]::FromArgb(255, 165, 0) # Orange
             $statusLabel.Text = 'Not connected'
             $statusLabel.ForeColor = [System.Drawing.Color]::FromArgb(255, 165, 0)
             $startButton.Enabled = $false
             $loginButton.Enabled = $true
             $logoutButton.Enabled = $false
+            $loginButton.Visible = $true
+            $logoutButton.Visible = $false
+            $accountLabel.Text = 'Not connected'
+            $accountLabel.ForeColor = $textGray
         }
     }
 
-    # Connection buttons
+    # Login Button
     $loginButton = New-Object System.Windows.Forms.Button
-    $loginButton.Location = New-Object System.Drawing.Point(20, 180)
-    $loginButton.Size = New-Object System.Drawing.Size(100, 30)
+    $loginButton.Location = New-Object System.Drawing.Point(10, 20)
+    $loginButton.Size = New-Object System.Drawing.Size(100, 25)
     $loginButton.Text = 'Login'
     $loginButton.BackColor = [System.Drawing.Color]::FromArgb(0, 150, 0)
     $loginButton.ForeColor = [System.Drawing.Color]::White
     $loginButton.FlatStyle = 'Flat'
     $loginButton.FlatAppearance.BorderSize = 0
     $loginButton.Add_Click({
-        $outputTextBox.AppendText("`n[LOGIN] Connecting to Exchange Online...`n")
-        $outputTextBox.AppendText("A code will appear - copy it, then sign in via browser.`n")
+        & $Log "Connecting to Exchange Online..."
+        & $Log "A code will appear - copy it, then sign in via browser."
         $statusLabel.Text = 'Connecting to Exchange Online...'
         $statusLabel.ForeColor = $accentBlue
         $form.Refresh()
@@ -356,24 +487,24 @@ function Start-GUI {
         try {
             # Try Device Code Flow first
             Connect-ExchangeOnline -Device -ShowBanner:$false -ErrorAction Stop
-            $outputTextBox.AppendText("[LOGIN] Connection established, verifying...`n")
+            & $Log "Connection established, verifying..."
 
             # Verify connection with our test function
             if (Test-ExchangeOnlineConnection) {
                 & $script:UpdateConnectionStatusBlock
-                $outputTextBox.AppendText("[SUCCESS] Connected successfully!`n")
+                & $Log "Connected successfully!"
             } else {
                 throw "Connection verification failed"
             }
         } catch {
             $err = $_.Exception.Message
             if ($err -match "parameter.*Device") {
-                $outputTextBox.AppendText("[LOGIN] Device parameter not supported, trying interactive mode...`n")
+                & $Log "Device parameter not supported, trying interactive mode..."
                 try {
                     Connect-ExchangeOnline -ShowBanner:$false -ErrorAction Stop
                     if (Test-ExchangeOnlineConnection) {
                         & $script:UpdateConnectionStatusBlock
-                        $outputTextBox.AppendText("[SUCCESS] Connected successfully!`n")
+                        & $Log "Connected successfully!"
                         return
                     }
                 } catch {
@@ -381,41 +512,42 @@ function Start-GUI {
                 }
             }
             
-            $connectionLabel.Text = 'X'
-            $connectionLabel.ForeColor = $accentRed
+            $connectionLabel.BackColor = $accentRed
             $statusLabel.Text = 'Connection failed'
             $statusLabel.ForeColor = $accentRed
             $startButton.Enabled = $false
-            $outputTextBox.AppendText("[LOGIN] Connection failed: $err`n")
+            & $Log "Connection failed: $err"
         }
     })
-    $form.Controls.Add($loginButton)
+    $connectionGroupBox.Controls.Add($loginButton)
 
+    # Logout Button
     $logoutButton = New-Object System.Windows.Forms.Button
-    $logoutButton.Location = New-Object System.Drawing.Point(130, 180)
-    $logoutButton.Size = New-Object System.Drawing.Size(100, 30)
+    $logoutButton.Location = New-Object System.Drawing.Point(120, 20)
+    $logoutButton.Size = New-Object System.Drawing.Size(100, 25)
     $logoutButton.Text = 'Logout'
     $logoutButton.BackColor = [System.Drawing.Color]::FromArgb(150, 0, 0)
     $logoutButton.ForeColor = [System.Drawing.Color]::White
     $logoutButton.FlatStyle = 'Flat'
     $logoutButton.FlatAppearance.BorderSize = 0
     $logoutButton.Enabled = $false
+    $logoutButton.Visible = $false
     $logoutButton.Add_Click({
-        $outputTextBox.AppendText("`n[LOGOUT] Disconnecting from Exchange Online...`n")
+        & $Log "Disconnecting from Exchange Online..."
         
         try {
             Disconnect-ExchangeOnline -Confirm:$false -ErrorAction Stop
             & $script:UpdateConnectionStatusBlock
-            $outputTextBox.AppendText("[LOGOUT] Disconnected successfully!`n")
+            & $Log "Disconnected successfully!"
         } catch {
-            $outputTextBox.AppendText("[LOGOUT] Disconnect failed: $($_.Exception.Message)`n")
+            & $Log "Disconnect failed: $($_.Exception.Message)"
         }
     })
-    $form.Controls.Add($logoutButton)
+    $connectionGroupBox.Controls.Add($logoutButton)
 
     # Rule Selection group
     $ruleGroupBox = New-Object System.Windows.Forms.GroupBox
-    $ruleGroupBox.Location = New-Object System.Drawing.Point(20, 220)
+    $ruleGroupBox.Location = New-Object System.Drawing.Point(20, 240)
     $ruleGroupBox.Size = New-Object System.Drawing.Size(660, 120)
     $ruleGroupBox.Text = 'Rule Selection'
     $ruleGroupBox.ForeColor = $textColor
@@ -453,6 +585,32 @@ function Start-GUI {
     $transportRulesCheckBox.BackColor = $bgDark
     $ruleGroupBox.Controls.Add($transportRulesCheckBox)
 
+    # EOP Link
+    $eopLink = New-Object System.Windows.Forms.LinkLabel
+    $eopLink.Location = New-Object System.Drawing.Point(10, 90)
+    $eopLink.Size = New-Object System.Drawing.Size(150, 20)
+    $eopLink.Text = 'Open EOP Anti-Spam'
+    $eopLink.LinkColor = $accentBlue
+    $eopLink.ActiveLinkColor = $accentGreen
+    $eopLink.BackColor = $bgMedium
+    $eopLink.Add_LinkClicked({
+        [System.Diagnostics.Process]::Start('https://security.microsoft.com/antispam')
+    })
+    $ruleGroupBox.Controls.Add($eopLink)
+
+    # Transport Rules Link
+    $transportLink = New-Object System.Windows.Forms.LinkLabel
+    $transportLink.Location = New-Object System.Drawing.Point(170, 90)
+    $transportLink.Size = New-Object System.Drawing.Size(150, 20)
+    $transportLink.Text = 'Open Transport Rules'
+    $transportLink.LinkColor = $accentBlue
+    $transportLink.ActiveLinkColor = $accentGreen
+    $transportLink.BackColor = $bgMedium
+    $transportLink.Add_LinkClicked({
+        [System.Diagnostics.Process]::Start('https://admin.exchange.microsoft.com/#/mailflow/rules')
+    })
+    $ruleGroupBox.Controls.Add($transportLink)
+
     # Download button
     $downloadButton = New-Object System.Windows.Forms.Button
     $downloadButton.Location = New-Object System.Drawing.Point(380, 25)
@@ -462,15 +620,16 @@ function Start-GUI {
     $downloadButton.ForeColor = [System.Drawing.Color]::White
     $downloadButton.FlatStyle = 'Flat'
     $downloadButton.FlatAppearance.BorderSize = 0
+    $downloadButton.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Right
     $downloadButton.Add_Click({
         # Check connection first
-        $outputTextBox.AppendText("`n[DOWNLOAD] Checking Exchange Online connection...`n")
+        & $Log "Checking Exchange Online connection..."
         try {
             # Test connection by trying to get a simple cmdlet
             $testCmdlet = Get-Command Get-HostedContentFilterPolicy -ErrorAction Stop
-            $outputTextBox.AppendText("[DOWNLOAD] [OK] Connection verified`n")
+            & $Log "Connection verified"
         } catch {
-            $outputTextBox.AppendText("[DOWNLOAD] [X] Connection check failed: $($_.Exception.Message)`n")
+            & $Log "Connection check failed: $($_.Exception.Message)"
             [System.Windows.Forms.MessageBox]::Show(
                 "Not connected to Exchange Online. Please click Login first.`nError: $($_.Exception.Message)",
                 'Connection Required',
@@ -498,13 +657,13 @@ function Start-GUI {
         $saveFileDialog.FileName = 'blocked_lists.txt'
 
         if ($saveFileDialog.ShowDialog() -eq 'OK') {
-            $outputTextBox.AppendText("[DOWNLOAD] Exporting selected rules to: $($saveFileDialog.FileName)`n")
+            & $Log "Exporting selected rules to: $($saveFileDialog.FileName)"
             
             try {
                 # Export selected rules
                 $exportedData = Export-SelectedRules -EOPSenders:$eopSendersCheckBox.Checked -EOPDomains:$eopDomainsCheckBox.Checked -TransportRules:$transportRulesCheckBox.Checked
                 $exportedData | Out-File -FilePath $saveFileDialog.FileName -Encoding UTF8
-                $outputTextBox.AppendText("[DOWNLOAD] Successfully exported rules`n")
+                & $Log "Successfully exported rules"
                 
                 [System.Windows.Forms.MessageBox]::Show(
                     "Rules exported successfully to:`n$($saveFileDialog.FileName)",
@@ -513,7 +672,7 @@ function Start-GUI {
                     'Information'
                 )
             } catch {
-                $outputTextBox.AppendText("[DOWNLOAD] [X] Export failed: $($_.Exception.Message)`n")
+                & $Log "Export failed: $($_.Exception.Message)"
                 [System.Windows.Forms.MessageBox]::Show(
                     "Export failed: $($_.Exception.Message)",
                     'Export Error',
@@ -534,15 +693,16 @@ function Start-GUI {
     $uploadButton.ForeColor = [System.Drawing.Color]::White
     $uploadButton.FlatStyle = 'Flat'
     $uploadButton.FlatAppearance.BorderSize = 0
+    $uploadButton.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Right
     $uploadButton.Add_Click({
         # Check connection first
-        $outputTextBox.AppendText("`n[UPLOAD] Checking Exchange Online connection...`n")
+        & $Log "Checking Exchange Online connection..."
         try {
             # Test connection by trying to get a simple cmdlet
             $testCmdlet = Get-Command Get-HostedContentFilterPolicy -ErrorAction Stop
-            $outputTextBox.AppendText("[UPLOAD] [OK] Connection verified`n")
+            & $Log "Connection verified"
         } catch {
-            $outputTextBox.AppendText("[UPLOAD] [X] Connection check failed: $($_.Exception.Message)`n")
+            & $Log "Connection check failed: $($_.Exception.Message)"
             [System.Windows.Forms.MessageBox]::Show(
                 "Not connected to Exchange Online. Please click Login first.`nError: $($_.Exception.Message)",
                 'Connection Required',
@@ -574,12 +734,12 @@ function Start-GUI {
             return
         }
 
-        $outputTextBox.AppendText("[UPLOAD] Importing file to selected rules...`n")
+        & $Log "Importing file to selected rules..."
         
         try {
             # Import file and update selected rules
             $result = Import-FileToSelectedRules -FilePath $fileTextBox.Text -EOPSenders:$eopSendersCheckBox.Checked -EOPDomains:$eopDomainsCheckBox.Checked -TransportRules:$transportRulesCheckBox.Checked
-            $outputTextBox.AppendText("[UPLOAD] Successfully updated rules`n")
+            & $Log "Successfully updated rules"
             
             [System.Windows.Forms.MessageBox]::Show(
                 $result,
@@ -588,7 +748,7 @@ function Start-GUI {
                 'Information'
             )
         } catch {
-            $outputTextBox.AppendText("[UPLOAD] [X] Import failed: $($_.Exception.Message)`n")
+            & $Log "Import failed: $($_.Exception.Message)"
             [System.Windows.Forms.MessageBox]::Show(
                 "Import failed: $($_.Exception.Message)",
                 'Import Error',
@@ -601,7 +761,7 @@ function Start-GUI {
 
     # Options group (moved down)
     $optionsGroupBox = New-Object System.Windows.Forms.GroupBox
-    $optionsGroupBox.Location = New-Object System.Drawing.Point(20, 350)
+    $optionsGroupBox.Location = New-Object System.Drawing.Point(20, 370)
     $optionsGroupBox.Size = New-Object System.Drawing.Size(660, 80)
     $optionsGroupBox.Text = 'Options'
     $optionsGroupBox.ForeColor = $textColor
@@ -626,12 +786,12 @@ function Start-GUI {
     $syncInfoLabel.Text = 'Warning: This will remove any blocked senders/domains not present in your text file.'
     $syncInfoLabel.Font = New-Object System.Drawing.Font('Segoe UI', 8)
     $syncInfoLabel.ForeColor = [System.Drawing.Color]::FromArgb(255, 165, 0)
-    $syncInfoLabel.BackColor = $bgDark
+    $syncInfoLabel.BackColor = $bgMedium
     $optionsGroupBox.Controls.Add($syncInfoLabel)
 
     # Progress group (moved down)
     $progressGroupBox = New-Object System.Windows.Forms.GroupBox
-    $progressGroupBox.Location = New-Object System.Drawing.Point(20, 440)
+    $progressGroupBox.Location = New-Object System.Drawing.Point(20, 460)
     $progressGroupBox.Size = New-Object System.Drawing.Size(660, 200)
     $progressGroupBox.Text = 'Progress'
     $progressGroupBox.ForeColor = $textColor
@@ -656,16 +816,7 @@ function Start-GUI {
     $statusLabel.BackColor = $bgDark
     $progressGroupBox.Controls.Add($statusLabel)
 
-    # Connection status indicator (top-right corner)
-    $connectionLabel = New-Object System.Windows.Forms.Label
-    $connectionLabel.Location = New-Object System.Drawing.Point(520, 15)
-    $connectionLabel.Size = New-Object System.Drawing.Size(60, 20)
-    $connectionLabel.Text = '●'
-    $connectionLabel.Font = New-Object System.Drawing.Font('Segoe UI', 12, [System.Drawing.FontStyle]::Bold)
-    $connectionLabel.ForeColor = [System.Drawing.Color]::FromArgb(255, 165, 0)
-    $connectionLabel.BackColor = $bgDark
-    $connectionLabel.TextAlign = 'MiddleCenter'
-    $form.Controls.Add($connectionLabel)
+
 
     # Progress bar
     $progressBar = New-Object System.Windows.Forms.ProgressBar
@@ -685,11 +836,27 @@ function Start-GUI {
     $outputTextBox.BackColor = $bgMedium
     $outputTextBox.ForeColor = $textColor
     $outputTextBox.BorderStyle = 'FixedSingle'
+    $outputTextBox.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Left -bor [System.Windows.Forms.AnchorStyles]::Right
+    $outputTextBox.Add_TextChanged({
+        $outputTextBox.SelectionStart = $outputTextBox.Text.Length
+        $outputTextBox.ScrollToCaret()
+    })
     $progressGroupBox.Controls.Add($outputTextBox)
+
+    # Action GroupBox (Bottom)
+    $actionGroupBox = New-Object System.Windows.Forms.GroupBox
+    $actionGroupBox.Location = New-Object System.Drawing.Point(20, 650)
+    $actionGroupBox.Size = New-Object System.Drawing.Size(660, 60)
+    $actionGroupBox.Text = ''
+    $actionGroupBox.ForeColor = $textColor
+    $actionGroupBox.BackColor = $bgMedium
+    $actionGroupBox.FlatStyle = 'Flat'
+    $actionGroupBox.Anchor = [System.Windows.Forms.AnchorStyles]::Bottom -bor [System.Windows.Forms.AnchorStyles]::Left -bor [System.Windows.Forms.AnchorStyles]::Right
+    $form.Controls.Add($actionGroupBox)
 
     # Start button
     $startButton = New-Object System.Windows.Forms.Button
-    $startButton.Location = New-Object System.Drawing.Point(450, 660)
+    $startButton.Location = New-Object System.Drawing.Point(440, 15)
     $startButton.Size = New-Object System.Drawing.Size(100, 30)
     $startButton.Text = 'Start'
     $startButton.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold)
@@ -698,6 +865,7 @@ function Start-GUI {
     $startButton.FlatStyle = 'Flat'
     $startButton.FlatAppearance.BorderSize = 0
     $startButton.Enabled = $false
+    $startButton.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Right
     $startButton.Add_Click({
         # Validate file path
         if (-not (Test-Path -LiteralPath $fileTextBox.Text)) {
@@ -747,16 +915,23 @@ function Start-GUI {
             if ($job.HasMoreData) {
                 $newOutput = Receive-Job -Job $job
                 if ($newOutput) {
-                    $outputText = ($newOutput | Out-String)
-                    $outputTextBox.AppendText($outputText)
+                    $outputText = ($newOutput | Out-String).Trim()
+                    if ($outputText) {
+                        $outputTextBox.AppendText("$outputText`r`n")
+                    }
 
                     # Update connection status based on output
                     if ($outputText -match 'Connected successfully') {
-                        $connectionLabel.Text = '[OK] Connected to Exchange Online'
-                        $connectionLabel.ForeColor = [System.Drawing.Color]::FromArgb(0, 200, 0)
+                        $connectionLabel.BackColor = [System.Drawing.Color]::FromArgb(0, 200, 0)
                     } elseif ($outputText -match 'Using existing') {
-                        $connectionLabel.Text = '[OK] Using existing Exchange Online connection'
-                        $connectionLabel.ForeColor = [System.Drawing.Color]::FromArgb(0, 200, 0)
+                        $connectionLabel.BackColor = [System.Drawing.Color]::FromArgb(0, 200, 0)
+                    }
+
+                    # Parse granular progress
+                    if ($outputText -match '\[PROGRESS\] (.*)') {
+                        $statusLabel.Text = $Matches[1]
+                        # Reset progress bar for new activity or keep it moving?
+                        # Let's just update the text for now.
                     }
                 }
             }
@@ -840,7 +1015,7 @@ function Start-GUI {
 
     # Close button
     $closeButton = New-Object System.Windows.Forms.Button
-    $closeButton.Location = New-Object System.Drawing.Point(570, 660)
+    $closeButton.Location = New-Object System.Drawing.Point(550, 15)
     $closeButton.Size = New-Object System.Drawing.Size(100, 30)
     $closeButton.Text = 'Close'
     $closeButton.Font = New-Object System.Drawing.Font('Segoe UI', 10)
@@ -848,26 +1023,28 @@ function Start-GUI {
     $closeButton.ForeColor = $textColor
     $closeButton.FlatStyle = 'Flat'
     $closeButton.FlatAppearance.BorderColor = $textGray
+    $closeButton.Anchor = [System.Windows.Forms.AnchorStyles]::Top -bor [System.Windows.Forms.AnchorStyles]::Right
     $closeButton.Add_Click({
         $form.Close()
     })
-    $form.Controls.Add($closeButton)
+    $actionGroupBox.Controls.Add($closeButton)
+    $actionGroupBox.Controls.Add($startButton)
 
     # Form Load event - Initialize GUI without auto-connect
     $form.Add_Load({
         $outputTextBox.Clear()
-        $outputTextBox.AppendText("Welcome to Exchange Online Spam Manager`n")
-        $outputTextBox.AppendText("Checking connection status...`n")
+        & $Log "Welcome to Exchange Online Spam Manager"
+        & $Log "Checking connection status..."
 
         # Check for existing session using our improved function
         if (Test-ExchangeOnlineConnection) {
             & $script:UpdateConnectionStatusBlock
-            $outputTextBox.AppendText("[INFO] Connected to Exchange Online`n")
+            & $Log "Connected to Exchange Online"
         } else {
             & $script:UpdateConnectionStatusBlock
-            $outputTextBox.AppendText("[INFO] Not connected. Please click 'Login' to connect.`n")
+            & $Log "Not connected. Please click 'Login' to connect."
         }
-        $outputTextBox.AppendText("`n")
+        $outputTextBox.AppendText("`r`n")
     })
 
     # Form resize event for responsive layout
@@ -879,24 +1056,28 @@ function Start-GUI {
         $titleLabel.Size = New-Object System.Drawing.Size(($formWidth - 40), 30)
         $subtitleLabel.Size = New-Object System.Drawing.Size(($formWidth - 40), 20)
 
+        # Adjust Connection GroupBox (Top)
+        $connectionGroupBox.Location = New-Object System.Drawing.Point(20, 80)
+        $connectionGroupBox.Size = New-Object System.Drawing.Size(($formWidth - 40), 60)
+
         # Adjust group boxes
+        $fileGroupBox.Location = New-Object System.Drawing.Point(20, 150)
         $fileGroupBox.Size = New-Object System.Drawing.Size(($formWidth - 40), 80)
-        $ruleGroupBox.Size = New-Object System.Drawing.Size(($formWidth - 40), 120)
-        $optionsGroupBox.Size = New-Object System.Drawing.Size(($formWidth - 40), 80)
-        $progressGroupBox.Size = New-Object System.Drawing.Size(($formWidth - 40), ($formHeight - 440))
-        $progressGroupBox.Location = New-Object System.Drawing.Point(20, 440)
-
-        # Adjust output textbox
-        $outputTextBox.Size = New-Object System.Drawing.Size(($formWidth - 60), ($formHeight - 490))
-
-        # Adjust buttons
-        $startButton.Location = New-Object System.Drawing.Point(($formWidth - 150), ($formHeight - 55))
-        $closeButton.Location = New-Object System.Drawing.Point(($formWidth - 100), ($formHeight - 55))
-        $loginButton.Location = New-Object System.Drawing.Point(20, 180)
-        $logoutButton.Location = New-Object System.Drawing.Point(130, 180)
         
-        # Adjust connection indicator (top-right)
-        $connectionLabel.Location = New-Object System.Drawing.Point(($formWidth - 80), 15)
+        $ruleGroupBox.Location = New-Object System.Drawing.Point(20, 240)
+        $ruleGroupBox.Size = New-Object System.Drawing.Size(($formWidth - 40), 120)
+        
+        $optionsGroupBox.Location = New-Object System.Drawing.Point(20, 370)
+        $optionsGroupBox.Size = New-Object System.Drawing.Size(($formWidth - 40), 80)
+        
+        # Adjust progress group box height
+        $progressGroupBox.Location = New-Object System.Drawing.Point(20, 460)
+        $progressGroupBox.Size = New-Object System.Drawing.Size(($formWidth - 40), ($formHeight - 540))
+        
+        # Adjust Action GroupBox (Bottom)
+        # Ensure it stays at the bottom and visible
+        $actionGroupBox.Location = New-Object System.Drawing.Point(20, ($formHeight - 80))
+        $actionGroupBox.Size = New-Object System.Drawing.Size(($formWidth - 40), 60)
     })
 
     # Show form

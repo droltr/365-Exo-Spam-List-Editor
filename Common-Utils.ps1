@@ -11,3 +11,8 @@ function Write-Info {
     $ts = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
     Write-Host "[$ts] $Message"
 }
+
+function Write-ProgressLog {
+    param([string]$Message)
+    Write-Host "[PROGRESS] $Message"
+}

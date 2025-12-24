@@ -1,0 +1,22 @@
+﻿# Exchange Online Spam Manager - Blocked List Example
+# Lines starting with # are comments and ignored.
+# Empty lines are ignored.
+
+# --- EMAIL ADDRESSES ---
+# Add email addresses to block specific senders.
+spammer@bad-domain.com
+phishing@malicious.net
+
+# --- DOMAINS ---
+# Add domains to block all emails from that domain.
+# Wildcards are supported (e.g., *.example.com).
+bad-domain.com
+*.malicious.net
+
+# --- KEYWORDS ---
+# Add keywords to block emails containing these words in subject or body.
+# This section must start with the exact line: ---keywords---
+---keywords---
+urgent action required
+verify your account
+lottery winner

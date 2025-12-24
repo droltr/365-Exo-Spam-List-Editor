@@ -174,6 +174,7 @@ function Create-OrUpdateRule {
     
     if (-not $ruleExists) {
         Write-Info "Creating new Transport Rule: '$RuleName'"
+        Write-ProgressLog "Creating new Transport Rule '$RuleName'..."
         # Create new rule with initial values
         $params = @{
             Name = $RuleName
@@ -237,6 +238,7 @@ function Update-ExistingRule {
     }
     
     if ($updated) {
+        Write-ProgressLog "Applying updates to Transport Rule '$RuleName'..."
         Set-TransportRule @params | Out-Null
         Write-Info "Transport Rule updated successfully."
     }

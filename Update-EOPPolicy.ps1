@@ -46,11 +46,13 @@ function Update-BlockedLists {
 
     if ($toAddEmails.Count -gt 0)  {
         Write-Progress -Activity 'Block Lists' -Status ("Adding emails ({0})" -f $toAddEmails.Count) -PercentComplete 75
+        Write-ProgressLog "Adding $($toAddEmails.Count) emails to EOP Blocked Senders..."
         Set-HostedContentFilterPolicy -Identity $PolicyName -BlockedSenders       @{ Add = $toAddEmails }
         Write-Info ("Added (emails): {0}" -f $toAddEmails.Count)
     }
     if ($toAddDomains.Count -gt 0) {
         Write-Progress -Activity 'Block Lists' -Status ("Adding domains ({0})" -f $toAddDomains.Count) -PercentComplete 80
+        Write-ProgressLog "Adding $($toAddDomains.Count) domains to EOP Blocked Domains..."
         Set-HostedContentFilterPolicy -Identity $PolicyName -BlockedSenderDomains @{ Add = $toAddDomains }
         Write-Info ("Added (domains): {0}" -f $toAddDomains.Count)
     }
@@ -71,11 +73,13 @@ function Update-BlockedLists {
 
         if ($toRemoveEmails.Count -gt 0)  {
             Write-Progress -Activity 'Block Lists' -Status ("Removing emails ({0})" -f $toRemoveEmails.Count) -PercentComplete 85
+            Write-ProgressLog "Removing $($toRemoveEmails.Count) emails from EOP Blocked Senders..."
             Set-HostedContentFilterPolicy -Identity $PolicyName -BlockedSenders       @{ Remove = $toRemoveEmails }
             Write-Info ("Removed (emails): {0}" -f $toRemoveEmails.Count)
         }
         if ($toRemoveDomains.Count -gt 0) {
             Write-Progress -Activity 'Block Lists' -Status ("Removing domains ({0})" -f $toRemoveDomains.Count) -PercentComplete 90
+            Write-ProgressLog "Removing $($toRemoveDomains.Count) domains from EOP Blocked Domains..."
             Set-HostedContentFilterPolicy -Identity $PolicyName -BlockedSenderDomains @{ Remove = $toRemoveDomains }
             Write-Info ("Removed (domains): {0}" -f $toRemoveDomains.Count)
         }

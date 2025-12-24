@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 - Standalone executable (`SpamManager.exe`).
 - Detailed progress logging with timestamps.
 - Connection status indicator and account display.
+- Comprehensive documentation (README, USAGE, CONTRIBUTING).
+- Project badges and download links in README.
 
 ### Fixed
 - Resolved layout issues with high-DPI displays.

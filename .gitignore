@@ -1,0 +1,26 @@
+# PowerShell
+*.psd1
+*.psm1
+*.ps1xml
+
+# User specific files
+*.txt
+!blocked_example.txt
+!blocked.txt
+
+# Executables
+*.exe
+
+# VS Code
+.vscode/
+
+# Temporary files
+*.tmp
+*.log
+
+# Pester tests results
+*.xml
+
+# OS generated
+Thumbs.db
+Desktop.ini

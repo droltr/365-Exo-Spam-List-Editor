@@ -9,8 +9,16 @@
 [CmdletBinding()]
 param()
 
+# Determine script root (handles both script and compiled EXE)
+if ($PSScriptRoot) {
+    $ScriptRoot = $PSScriptRoot
+} else {
+    # For compiled EXE, get the directory of the executable
+    $ScriptRoot = [System.IO.Path]::GetDirectoryName([System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName)
+}
+
 # Import GUI module
-. "$PSScriptRoot\GUI-Interface.ps1"
+. "$ScriptRoot\GUI-Interface.ps1"
 
 # Start the GUI
 Start-GUI

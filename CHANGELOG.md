@@ -2,10 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.0] - 2024-12-24
+## [0.9.0] - 2024-12-24
 
 ### Added
-- Initial release of Exchange Online Spam Manager.
+- Initial release of Exchange Online Spam Manager (Beta).
 - Modern Windows Forms GUI with dark theme.
 - Support for EOP Blocked Senders and Domains.
 - Support for Transport Rules (Keywords, Emails, Domains).

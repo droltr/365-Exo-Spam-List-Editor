@@ -1,5 +1,5 @@
 ﻿# Exported from Exchange Online Spam Manager
-# Date: 12/23/2025 00:28:57
+# Date: 12/24/2025 22:33:59
 
 EMAIL ADDRESSES
 elif.gunyuzu@bilgiinfo.bbs.tr

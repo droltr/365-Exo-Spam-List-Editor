@@ -5,7 +5,7 @@ Thank you for your interest in contributing! We welcome bug reports, feature req
 ## How to Contribute
 
 1. **Fork the Repository:** Click the "Fork" button on GitHub.
-2. **Clone your Fork:** `git clone https://github.com/YOUR_USERNAME/SpamManager.git`
+2. **Clone your Fork:** `git clone https://github.com/droltr/SpamManager.git`
 3. **Create a Branch:** `git checkout -b feature/amazing-feature`
 4. **Make Changes:** Implement your feature or fix.
 5. **Test:** Run the tests in the `tests/` directory.

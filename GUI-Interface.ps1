@@ -159,13 +159,38 @@ function Import-FileToSelectedRules {
             Write-Host "[IMPORT] [OK] EOP domains updated" -ForegroundColor Green
         }
         
-        if ($TransportRules -and ($data.Emails.Count -gt 0 -or $data.Domains.Count -gt 0 -or $data.Keywords.Count -gt 0)) {
+        if ($TransportRules) {
             Write-Host "[IMPORT] Updating Transport Rules..." -ForegroundColor Yellow
-            Write-Host "[IMPORT]   Adding $($data.Emails.Count) emails, $($data.Domains.Count) domains, $($data.Keywords.Count) keywords" -ForegroundColor Gray
             . "$PSScriptRoot\Update-TransportRule.ps1"
-            Create-OrUpdateRule -RuleName "Blocked Emails" -Emails $data.Emails -Domains $data.Domains -Keywords $data.Keywords
-            $result += "- Updated Transport Rules with $($data.Emails.Count) emails, $($data.Domains.Count) domains, $($data.Keywords.Count) keywords`n"
-            Write-Host "[IMPORT] [OK] Transport rules updated" -ForegroundColor Green
+
+            $updatedTransportRules = $false
+
+            if ($data.Emails.Count -gt 0) {
+                Write-Host "[IMPORT]   Updating 'Blocked Emails' rule with $($data.Emails.Count) emails..." -ForegroundColor Gray
+                Create-OrUpdateRule -RuleName "Blocked Emails" -Emails $data.Emails
+                $result += "- Updated 'Blocked Emails' Transport Rule with $($data.Emails.Count) emails`n"
+                $updatedTransportRules = $true
+            }
+
+            if ($data.Domains.Count -gt 0) {
+                Write-Host "[IMPORT]   Updating 'Blocked Domains' rule with $($data.Domains.Count) domains..." -ForegroundColor Gray
+                Create-OrUpdateRule -RuleName "Blocked Domains" -Domains $data.Domains
+                $result += "- Updated 'Blocked Domains' Transport Rule with $($data.Domains.Count) domains`n"
+                $updatedTransportRules = $true
+            }
+
+            if ($data.Keywords.Count -gt 0) {
+                Write-Host "[IMPORT]   Updating 'Blocked Words' rule with $($data.Keywords.Count) keywords..." -ForegroundColor Gray
+                Create-OrUpdateRule -RuleName "Blocked Words" -Keywords $data.Keywords
+                $result += "- Updated 'Blocked Words' Transport Rule with $($data.Keywords.Count) keywords`n"
+                $updatedTransportRules = $true
+            }
+
+            if ($updatedTransportRules) {
+                Write-Host "[IMPORT] [OK] Transport rules updated" -ForegroundColor Green
+            } else {
+                Write-Host "[IMPORT] [!] No new transport rule entries found in file" -ForegroundColor Yellow
+            }
         }
         
         $result += "`nImport completed successfully!"

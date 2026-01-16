@@ -206,37 +206,35 @@ function Update-ExistingRule {
     
     $tr = Get-TransportRule -Identity $RuleName
     
+    # Get current values
+    $currentEmails = @($tr.From)
+    $currentDomains = @($tr.SenderDomainIs)
+    $currentKeywords = @($tr.SubjectOrBodyContainsWords)
+    
+    # Merge with new values (incremental add)
+    $newEmails = @($currentEmails) + @($Emails) | Sort-Object -Unique
+    $newDomains = @($currentDomains) + @($Domains) | Sort-Object -Unique
+    $newKeywords = @($currentKeywords) + @($Keywords) | Sort-Object -Unique
+    
     $params = @{ Identity = $tr.Identity }
     $updated = $false
     
-    # Update From (Emails) if provided
-    if ($PSBoundParameters.ContainsKey('Emails')) {
-        $currentEmails = @($tr.From)
-        $newEmails = @($currentEmails) + @($Emails) | Sort-Object -Unique
-        if ($newEmails.Count -gt 0) {
-            $params['From'] = $newEmails
-            $updated = $true
-        }
+    # Update From (Emails)
+    if ($newEmails.Count -gt 0) {
+        $params['From'] = $newEmails
+        $updated = $true
     }
     
-    # Update SenderDomainIs if provided
-    if ($PSBoundParameters.ContainsKey('Domains')) {
-        $currentDomains = @($tr.SenderDomainIs)
-        $newDomains = @($currentDomains) + @($Domains) | Sort-Object -Unique
-        if ($newDomains.Count -gt 0) {
-            $params['SenderDomainIs'] = $newDomains
-            $updated = $true
-        }
+    # Update SenderDomainIs
+    if ($newDomains.Count -gt 0) {
+        $params['SenderDomainIs'] = $newDomains
+        $updated = $true
     }
     
-    # Update Keywords if provided
-    if ($PSBoundParameters.ContainsKey('Keywords')) {
-        $currentKeywords = @($tr.SubjectOrBodyContainsWords)
-        $newKeywords = @($currentKeywords) + @($Keywords) | Sort-Object -Unique
-        if ($newKeywords.Count -gt 0) {
-            $params['SubjectOrBodyContainsWords'] = $newKeywords
-            $updated = $true
-        }
+    # Update Keywords
+    if ($newKeywords.Count -gt 0) {
+        $params['SubjectOrBodyContainsWords'] = $newKeywords
+        $updated = $true
     }
     
     if ($updated) {

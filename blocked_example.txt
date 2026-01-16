@@ -1,4 +1,4 @@
-﻿# Exchange Online Spam Manager - Blocked List Example
+﻿# 365 Exo Spam List Editor - Blocked List Example
 # Lines starting with # are comments and ignored.
 # Empty lines are ignored.
 

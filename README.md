@@ -44,10 +44,15 @@ Install-Module -Name ExchangeOnlineManagement
 
 ## Usage
 
-Run the startup script via PowerShell:
-`powershell
+Run the startup script via the batch launcher:
+```batch
+.\Run-365ExoSpamListEditor.bat
+```
+
+Or directly via PowerShell:
+```powershell
 .\Start-365ExoSpamListEditor.ps1
-`
+```
 
 ## How to Use
 

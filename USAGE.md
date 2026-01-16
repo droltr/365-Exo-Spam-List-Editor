@@ -12,7 +12,7 @@ This guide provides detailed instructions on how to use the 365 Exo Spam List Ed
 
 ## Getting Started
 
-Launch the application using `365ExoSpamListEditor.exe` or `Run-365ExoSpamListEditor.bat`. The main interface will appear.
+Launch the application using `Run-365ExoSpamListEditor.bat`. Alternatively, you can run the `Start-365ExoSpamListEditor.ps1` script directly in PowerShell. The main interface will appear.
 
 ## Authentication
 

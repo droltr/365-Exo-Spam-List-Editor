@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2026-01-16
+
+### Changed
+- Refined project structure and performed comprehensive cleanup.
+- Improved batch launcher (`Run-365ExoSpamListEditor.bat`) with better path handling.
+- Optimized documentation (README.md, USAGE.md) for clarity and accuracy.
+- Enhanced `.gitignore` to better handle temporary files and archives.
+- Initialized project tracking with Conductor framework.
+
+### Removed
+- Removed legacy and redundant files from the root directory to `.deleted/`.
+
 ## [0.9.0] - 2024-12-24
 
 ### Added
